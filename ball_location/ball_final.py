@@ -18,7 +18,7 @@ from scipy.signal import find_peaks
 from PyQt5.QtGui import QIcon
 import matplotlib.pyplot as plt
 import os
-
+#增加一个注释
 def resource_path(relative_path):
     """ 获取资源路径 """
     if hasattr(sys, '_MEIPASS'):
