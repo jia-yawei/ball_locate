@@ -448,7 +448,7 @@ class MainWindow(QMainWindow):
                 for i in range(0,len(x2_data_sub)-1):   
                     dis1[i+1]=dis1[i]+x2_data_sub[i]*(x2_time_sub[reference_index+i+1]-x2_time_sub[reference_index+i])     
                 #将积分的值累加到数组中后，再将数组中的值进行积分运算   
-                print(len(dis1))
+                
                 x1_col = self.combo_box_x1.currentText()
                 x1_data2 = self.IMU_data.loc[:, x1_col]
                 x1_data2_sub = x1_data2[reference_index:suspicious_index+1].reset_index(drop=True)
@@ -702,12 +702,26 @@ class MainWindow(QMainWindow):
         if not hasattr(self, 'sound_data')or self.sound_data is None:
             QMessageBox.warning(self, "错误", "请正确加载声音文件")
             return
-        sound_dt = self.sound_data.iloc[1:, 2:]#取出声音数据
-        sound_dt_array=sound_dt.values.ravel()#转化成一维数组
+        
+        sound_dt = self.sound_data.iloc[0:, 2:]  # 取出声音数据
+        sound_dt_array = pd.to_numeric(sound_dt.values.ravel(), errors='coerce')  # 转化成一维数组并转换为数字
 
+        # 定义无效值列表
+        invalid_values = [-32768, '其他无效值']
+
+         # 将一维数组中的无效值替换为nan
+        for invalid_value in invalid_values:
+            sound_dt_array = np.where(sound_dt_array == invalid_value, np.nan, sound_dt_array)
+        # 将nan替换为前后两个值的平均值
+        sound_dt_array = pd.Series(sound_dt_array).interpolate().values
+         
+
+
+
+        
         #取出时间戳并在声音时间戳数组最后增加一个元素
 
-        sound_time = self.sound_data.iloc[1:, 0].values
+        sound_time = self.sound_data.iloc[0:, 0].values
         end_sound_data = sound_time[-1] + (sound_time[-1] - sound_time[-2])
         sound_time=np.append(sound_time,end_sound_data) 
         sound_time=np.array(sound_time) 
@@ -718,7 +732,7 @@ class MainWindow(QMainWindow):
        
         #创建一个空列表保存扩充后的时间戳
         sound_time_inserts = []
-
+         
         #插入元素
         for i in range(len(sound_time)-1):
             sound_time_inserts.extend(np.linspace(sound_time[i],sound_time[i+1],num_sound_inserts+2,endpoint=False))   
@@ -726,12 +740,25 @@ class MainWindow(QMainWindow):
         #sound_time_inserts.append(sound_time_inserts[-1])
         sound_time_inserts=np.array(sound_time_inserts) 
         
+
+
+        #截取声音时间戳和声音数据数组的长度，保证两者长度一致
+        
+        min_length = min(len(sound_time_inserts), len(sound_dt_array))
+        sound_time_inserts = sound_time_inserts[:min_length]
+        sound_dt_array = sound_dt_array[:min_length]
+        
         #绘制图形
         self.figure4.clear()
         ax4 = self.figure4.add_subplot(111)
         ax4.plot(sound_time_inserts,sound_dt_array) 
         self.figure4.tight_layout()    
         
+        # 添加导航工具栏
+        toolbar = NavigationToolbar(self.canvas4, self)
+        self.grid_layout.addWidget(toolbar, 6, 1)
+        self.canvas4.draw()
+
         #清除图形
         self.figure6.clear()   
         
@@ -749,10 +776,7 @@ class MainWindow(QMainWindow):
 
         # 刷新图形
         self.canvas6.draw()
-        # 添加导航工具栏
-        toolbar = NavigationToolbar(self.canvas4, self)
-        self.grid_layout.addWidget(toolbar, 6, 1)
-        self.canvas4.draw()
+
     
     #定义一个加载位置的函数
     def load_position(self):
