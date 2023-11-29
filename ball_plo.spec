@@ -32,7 +32,7 @@ exe = EXE(pyz,
           runtime_tmpdir=None,
           console=False,
           icon='ball_ico.ico',
-          version='version.txt')  # 设置版本号为1.1.0
+          version='version.txt')  # 设置版本号为1.1.1
 coll = COLLECT(exe,
                a.binaries,
                a.zipfiles,
