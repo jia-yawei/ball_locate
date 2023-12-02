@@ -264,11 +264,12 @@ class MainWindow(QMainWindow):
         self.canvas3 = FigureCanvas(self.figure3)
         self.figure4 = Figure()
         self.canvas4 = FigureCanvas(self.figure4)
-        # 设置图形区域的宽度
-        self.canvas1.setFixedWidth(800) 
-        self.canvas2.setFixedWidth(800) 
-        self.canvas3.setFixedWidth(800) 
-        self.canvas4.setFixedWidth(800) 
+        # 设置图形区域的大小
+        self.canvas1.setFixedSize(800, 300)
+        self.canvas2.setFixedSize(800, 300) 
+        self.canvas3.setFixedSize(800, 300) 
+        self.canvas4.setFixedSize(800, 300) 
+
 
     
         # 将按钮、下拉框、标签和图形区域添加到主布局中
@@ -715,20 +716,16 @@ class MainWindow(QMainWindow):
         # 将nan替换为前后两个值的平均值
         sound_dt_array = pd.Series(sound_dt_array).interpolate().values
          
-
-
-
-        
         #取出时间戳并在声音时间戳数组最后增加一个元素
 
-        sound_time = self.sound_data.iloc[0:, 0].values
+        sound_time = self.sound_data.iloc[1:, 0].values
         end_sound_data = sound_time[-1] + (sound_time[-1] - sound_time[-2])
         sound_time=np.append(sound_time,end_sound_data) 
         sound_time=np.array(sound_time) 
         
         #在声音时间戳之间增加元素，保证和转化后的声音数据数组长度一致
         #插入元素数量
-        num_sound_inserts = 254
+        num_sound_inserts = 510
        
         #创建一个空列表保存扩充后的时间戳
         sound_time_inserts = []
@@ -767,10 +764,11 @@ class MainWindow(QMainWindow):
         # 清理声音信号
         sound_dt_array = sound_dt_array[~np.isnan(sound_dt_array)]
         # 计算声音信号的频谱
-        frequencies, _, Sxx = signal.spectrogram(sound_dt_array, fs=5600)
+        frequencies, _, Sxx = signal.spectrogram(sound_dt_array, fs=5200)
         # 重采样sound_time_inserts
         sound_time_inserts_resampled = np.linspace(sound_time_inserts.min(), sound_time_inserts.max(), Sxx.shape[1]) 
-            
+        epsilon = 1e-10  # 一个非零的小数
+        Sxx = np.where(Sxx == 0, epsilon, Sxx)  # 将Sxx中的零值替换为epsilon    
         # 绘制时频图
         ax6.pcolormesh(sound_time_inserts_resampled, frequencies, 10 * np.log10(Sxx), shading='gouraud')
 
