@@ -38,7 +38,7 @@ class MainWindow(QMainWindow):
         self.ax5 = None
         self.init_variables()
         # 设置窗口名称
-        self.setWindowTitle("智能球定位分析系统1.0")
+        self.setWindowTitle("智能球定位分析系统V1.1.1")
         # 使用图标
         icon1_path = resource_path('ball_ico.ico')
         icon2_path = resource_path('open_file.png')
