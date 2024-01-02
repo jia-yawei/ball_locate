@@ -16,7 +16,7 @@ VSVersionInfo(
         u'040904b0',
         [StringStruct(u'CompanyName', u'北京交通大学'),
         StringStruct(u'ProductName', u'内检测智能球'),
-        StringStruct(u'ProductVersion', u'1.1.1')])
+        StringStruct(u'ProductVersion', u'1.0')])
       ]),
     VarFileInfo([VarStruct(u'Translation', [0x409, 1200])])
   ]
